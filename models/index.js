@@ -22,6 +22,10 @@ Object.keys(db).forEach(function(modelName) {
   }
 });
 
+// db.Service.find({include: {all:true}}).success(function(r) {
+//   console.log(r.toJSON());
+// })
+
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 

@@ -1,0 +1,12 @@
+extends layout
+
+block content
+  form(method='POST', action='/register')
+      .form-group
+          label(for='inputEmail') Email
+          input#inputEmail.form-control(type='email', placeholder='Email', name='user[email]')
+      .form-group
+          label(for='inputPassword') Password
+          input#inputPassword.form-control(type='password', placeholder='Password', name='user[password]')
+      div(style="height: 10px")
+      button.btn.btn-block.btn-primary(type='submit') Sign Up!

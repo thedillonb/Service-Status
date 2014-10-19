@@ -1,6 +1,9 @@
 module.exports = function(sequelize, DataTypes) {
     var Service = sequelize.define('Service', {
-        name: DataTypes.STRING
+        name: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        }
     }, {
         classMethods: {
             associate: function(models) {
@@ -8,6 +11,15 @@ module.exports = function(sequelize, DataTypes) {
                 Service.hasMany(models.Incident);
                 Service.hasMany(models.Subscriber);
                 Service.hasMany(models.Metric);
+            }
+        },
+        instanceMethods: {
+            toJSON: function() {
+                return {
+                    id: this.id,
+                    name: this.name,
+                    owner: this.User
+                };
             }
         }
     });
