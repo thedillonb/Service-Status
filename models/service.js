@@ -1,3 +1,5 @@
+var _ = require('underscore');
+
 module.exports = function(sequelize, DataTypes) {
     var Service = sequelize.define('Service', {
         name: {
@@ -11,6 +13,9 @@ module.exports = function(sequelize, DataTypes) {
                 Service.hasMany(models.Incident);
                 Service.hasMany(models.Subscriber);
                 Service.hasMany(models.Metric);
+            },
+            filter: function(value) {
+                return _.pick(value, 'name');
             }
         },
         instanceMethods: {
@@ -18,7 +23,9 @@ module.exports = function(sequelize, DataTypes) {
                 return {
                     id: this.id,
                     name: this.name,
-                    owner: this.User
+                    owner: this.User,
+                    updated_at: this.updatedAt,
+                    created_at: this.createdAt
                 };
             }
         }

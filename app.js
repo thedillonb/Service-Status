@@ -9,6 +9,9 @@ var routes = require('./routes');
 var passport = require('passport');
 var session = require('express-session');
 var BasicStrategy = require('passport-http').BasicStrategy;
+var config    = require('./config/config.json');
+var env       = process.env.NODE_ENV || "development";
+var influx = require('influx')(config['influx'][env]);
 
 var app = module.exports = express();
 
@@ -16,11 +19,11 @@ var app = module.exports = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
-//app.use(require('express-promise')());
+app.use(require('express-promise')());
 app.use(favicon());
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(session({ secret: 'supersecretsecret', resave: true, saveUninitialized: true }));
 app.use(passport.initialize());
@@ -50,6 +53,7 @@ passport.deserializeUser(function(id, done) {
 // Inject models
 app.use(function(req, res, next) {
     req.db = models;
+    req.influx = influx;
     next();
 });
 

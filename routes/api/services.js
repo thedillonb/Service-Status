@@ -1,28 +1,9 @@
 var express = require('express');
-var _ = require('underscore');
+var Promise = require('bluebird');
 var router = express.Router();
-
-
-router.param('id', function (req, res, next, id) {
-  console.log('CALLED ONLY ONCE');
-  next();
-})
-
-router.get('/user/:id', function (req, res, next) {
-  console.log('although this matches');
-  next();
-});
-
-router.get('/user/:id', function (req, res) {
-  console.log('and this matches too');
-  res.end();
-});
-
-
 
 /* Load the service if it's available */
 router.param('service_id', function(req, res, next, id) {
-    console.trace('fuck');
     req.user.getServices({ where: { id: id }, include: [ req.db.User ]})
         .then(function(result) {
             if (result.length == 0) {
@@ -30,6 +11,7 @@ router.param('service_id', function(req, res, next, id) {
             }
             else {
                 req.service = result[0];
+                req.influx.options.database = req.service.id.toString();
                 next();
             }
         })
@@ -43,18 +25,22 @@ router.get('/', function(req, res) {
 
 /* POST (create) a service */
 router.post('/', function(req, res, next) {
-    res.json(req.user.createService(_.pick(req.body, 'name'))
+    res.json(req.user.createService(req.db.Service.filter(req.body))
         .then(function (result) {
-            return req.user.getServices({ where: { id: result.id }, include: [ req.db.User ] });
-        })
-        .then(function (results) {
-            return results[0];
+            var createDbAsync = Promise.promisify(req.influx.createDatabase, req.influx);
+            return createDbAsync(result.id.toString())
+                .then(function() {
+                    return req.user.getServices({ where: { id: result.id }, include: [ req.db.User ] });
+                })
+                .then(function (results) { 
+                    return results[0]; 
+                });
         }));
 });
 
 /* PATCH (update) a service */
 router.patch('/:service_id', function(req, res) {
-    res.json(req.service.updateAttributes(_.pick(req.body, 'name')));
+    res.json(req.service.updateAttributes(req.db.Service.filter(req.body)));
 });
 
 /* GET a service */
@@ -64,7 +50,10 @@ router.get('/:service_id', function(req, res) {
 
 /* DELETE a service */
 router.delete('/:service_id', function(req, res, next) {
-    req.service.destroy().done(function() { res.send(200); }, next);
+    var deleteDbAsync = Promise.promisify(req.influx.deleteDatabase);
+    deleteDbAsync(req.service.id)
+        .then(function() { return req.service.destroy(); })
+        .done(function() { res.send(200); }, next)
 });
 
 // Child routes

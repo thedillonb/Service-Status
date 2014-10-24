@@ -1,13 +1,8 @@
 var express = require('express');
-var _ = require('underscore');
 var router = express.Router();
 
-// White listed attributes
-var whiteListAttributes = ['email', 'phone_number', 'url_endpoint'];
-
 /* Load the subscriber if it's available */
-router.param('fuck_you', function(req, res, next, id) {
-    console.trace('here i am');
+router.param('subscriber_id', function(req, res, next, id) {
     req.service.getSubscribers({ where: { id: id } })
         .then(function(result) {
             if (result.length == 0) {
@@ -28,18 +23,17 @@ router.get('/', function(req, res) {
 
 /* POST (create) a subscription */
 router.post('/', function(req, res) {
-    res.json(req.service.createSubscriber(_.pick(req.body, whiteListAttributes)));
+    res.json(req.service.createSubscriber(req.db.Subscriber.filter(req.body)));
 });
 
 /* GET a subscription */
-router.get('/:fuck_you', function(req, res) {
-    console.log('why god...');
+router.get('/:subscriber_id', function(req, res) {
     res.json(req.subscriber);
 });
 
 /* PATCH (update) a subscription */
-router.patch('/:fuck_you', function(req, res) {
-    res.json(req.subscriber.updateAttributes(_.pick(req.body, whiteListAttributes)));
+router.patch('/:subscriber_id', function(req, res) {
+    res.json(req.subscriber.updateAttributes(req.db.Subscriber.filter(req.body)));
 });
 
 
