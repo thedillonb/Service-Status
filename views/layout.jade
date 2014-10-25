@@ -4,5 +4,9 @@ html
     title= title
     link(rel='stylesheet', href='/stylesheets/style.css')
     link(rel='stylesheet', href='//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css')
+    script(src='https://code.jquery.com/jquery-1.11.1.min.js')
+    script(src='//cdnjs.cloudflare.com/ajax/libs/flot/0.8.2/jquery.flot.min.js')
+    script(src='//cdnjs.cloudflare.com/ajax/libs/flot/0.8.2/jquery.flot.time.min.js')
   body
-    block content
+    .container
+        block content

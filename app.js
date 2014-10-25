@@ -11,7 +11,7 @@ var session = require('express-session');
 var BasicStrategy = require('passport-http').BasicStrategy;
 var config    = require('./config/config.json');
 var env       = process.env.NODE_ENV || "development";
-var influx = require('influx')(config['influx'][env]);
+var influx = require('influx');
 
 var app = module.exports = express();
 
@@ -53,7 +53,7 @@ passport.deserializeUser(function(id, done) {
 // Inject models
 app.use(function(req, res, next) {
     req.db = models;
-    req.influx = influx;
+    req.influx = influx(config['influx'][env]);
     next();
 });
 

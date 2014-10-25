@@ -1,0 +1,34 @@
+extends layout
+
+block content
+    .row
+        .col-md-12
+            h1= title
+    - each metric in metrics
+        .row
+            .col-md-12
+                h3= metric.metric.name
+                div(id="placeholder-" + metric.metric.id, style="width:100%;height:200px;")
+                script(type="text/javascript").
+                    $(function() {
+                        var points = !{JSON.stringify(metric.data)}
+                        var data = {
+                            data: points,
+                            color: "#000",
+                            points: { show: false },
+                            lines: { show: true }
+                        };
+
+                        $.plot('#placeholder-!{metric.metric.id}', [data], {
+                            series: {
+                                lines: { show: true },
+                                points: { show: true }
+                            },
+                            xaxis: { 
+                                mode: "time",
+                                twelveHourClock: true
+                            }
+                        })
+                    })
+
+

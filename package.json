@@ -14,6 +14,7 @@
     "express": "^4.10.0",
     "express-promise": "^0.3.0",
     "express-session": "^1.9.1",
+    "express-subdomain": "^1.0.1",
     "influx": "^2.1.0",
     "jade": "^1.7.0",
     "morgan": "^1.4.1",
